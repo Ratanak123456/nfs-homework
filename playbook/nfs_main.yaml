@@ -1,0 +1,6 @@
+---
+- name: Setup NFS Server
+  import_playbook: nfs_server.yaml
+- name: Setup NFS Client
+  import_playbook: nfs_client.yaml
+   
