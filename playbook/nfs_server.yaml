@@ -13,7 +13,6 @@
           - fish
           - tree
           - neofetch
-          - nginx
         state: present
 
     - name: Install NFS Server
@@ -39,7 +38,6 @@
 
     - name: Apply NFS Configuration
       command: exportfs -ra
-      changed_when: false
 
     - name: Restart NFS Server
       systemd:
