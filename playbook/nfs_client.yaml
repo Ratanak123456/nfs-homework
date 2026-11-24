@@ -1,40 +1,42 @@
 - name: NFS Client Playbook
-  host: nfs_client
+  hosts: nfs_client
   become: true
+  
   tasks:
-  - name: Update APT
-    apt:
-      update_cache: true
-  - name: Install Packages
-    apt:
-      name:
-        - fish
-        - tree
-        - neofetch
-        - nginx
-      state: present
-  - name: Install NFS Client
-    apt: 
-      name: nfs-common
-      state: present
-  - name: Create the mounting DIR
-    file:
-      path: "{{nfs_client.mount_path}}"
-      state: directory
-      owner: "nobody"
-      group: "nogroup"
-      mode: "0777"
-  - name: Munt the Client to the server
-    mount:
-      src: "{{ nfs_server.ip }}:{{nfs_server.mount_path}}"
-      path: "{{nfs_client.mount_path}}"
-      fstype:nfs
-      opts: default,_netdev 
-      state: mounted
-  - name: Presist Mount
-    mount:
-    src: "{{ nfs_server.ip }}:{{nfs_server.mount_path}}"
-    path: "{{nfs_client.mount_path}}"
-    fstype:nfs
-    opts: default,_netdev 
-    state: present
+    - name: Update APT
+      apt:
+        update_cache: true
+    - name: Install Packages
+      apt:
+        name:
+          - fish
+          - tree
+          - neofetch
+          - nginx
+        state: present
+    - name: Install NFS Client
+      apt: 
+        name: nfs-common
+        state: present
+    - name: Create the mounting DIR
+      file:
+        path: "{{nfs_client.mount_path}}"
+        state: directory
+        owner: "nobody"
+        group: "nogroup"
+        mode: "0777"
+    - name: Munt the Client to the server
+      mount:
+        src: "{{ nfs_server.ip }}:{{nfs_server.mount_path}}"
+        path: "{{nfs_client.mount_path}}"
+        fstype: nfs
+        opts: default,_netdev 
+        state: mounted
+    - name: Persist Mount
+      mount:
+        src: "{{ nfs_server.ip }}:{{nfs_server.mount_path}}"
+        path: "{{nfs_client.mount_path}}"
+        fstype: nfs
+        opts: default,_netdev 
+        state: present
+      

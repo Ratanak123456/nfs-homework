@@ -1,39 +1,48 @@
 - name: NFS Server Playbook
-  hots: nfs_server
+  hosts: nfs_server
   become: true
+
   tasks:
-  - name: Update APT
-    apt:
-      update_cache: true
-  - name: Install Packages
-    apt:
-      name:
-        - fish
-        - tree
-        - neofetch
-        - nginx
-  - name: Install NFS Server
-    apt:
-      name: nfs-kernel-server
-      state: present
-  - name: Create NFS Server DIR
-    file:
-      path: "{{ nfs_server.mount_path }}"
-      state: directory
-      group: "nogroup"
-      owner: "nobody"
-      mode: "0777"
-  - name: Config File Export
-    lineinfile:
-      path: /etc/exports/
-      line: "{{nfs_server.mount_path}} {{item}}(rw,sync,no_subtree_check,no_root_squash)"
-      create: yes
-      state: present
-    loop: "{{ nfs_client.ips }}" 
-  - name: Apply Configuration
-    command: exportfs -ra
-  - name: Restart NFS Server
-    systemd: 
-      name: nfs-kernel-server
-      state: restarted
-      enable: true
+    - name: Update APT
+      apt:
+        update_cache: true
+
+    - name: Install Packages
+      apt:
+        name:
+          - fish
+          - tree
+          - neofetch
+          - nginx
+        state: present
+
+    - name: Install NFS Server
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Create NFS Server DIR
+      file:
+        path: "{{ nfs_server.mount_path }}"
+        state: directory
+        group: nogroup
+        owner: nobody
+        mode: "0777"
+
+    - name: Configure NFS Exports
+      lineinfile:
+        path: /etc/exports
+        line: "{{ nfs_server.mount_path }} {{ item }}(rw,sync,no_subtree_check,no_root_squash)"
+        create: true
+        state: present
+      loop: "{{ nfs_client.ips }}"
+
+    - name: Apply NFS Configuration
+      command: exportfs -ra
+      changed_when: false
+
+    - name: Restart NFS Server
+      systemd:
+        name: nfs-kernel-server
+        state: restarted
+        enabled: true
